@@ -37,6 +37,9 @@ class Link < Post
   # Массив из трех строк: адрес ссылки, описание и дата создания
   # Будет реализован в след. уроке
   def to_strings
+    time_string = "Создано: #{@created_at.strftime('%Y.%m.%d, %H:%M:%S')} \n\r"
+
+    [@url, @text, time_string]
   end
 
   def to_db_hash

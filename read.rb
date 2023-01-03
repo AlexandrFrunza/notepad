@@ -1,8 +1,7 @@
-require_relative 'post.rb'
-require_relative 'link.rb'
-require_relative 'task.rb'
-require_relative 'memo.rb'
-
+require_relative 'post'
+require_relative 'memo'
+require_relative 'link'
+require_relative 'task'
 
 require 'optparse'
 
@@ -16,31 +15,46 @@ OptionParser.new do |opt|
     exit
   end
 
-  opt.on('--type POST TYPE', 'какой тип постов показывать (по умолчанию любой)') {|o| options[:type] = o} #
-  opt.on('--id POST ID', 'если задан id - показываем подробно только этот пост') {|o| options[:id] = o} #
-  opt.on('--limit NUMBER', 'сколько последний постов показать (по умолчанию все)') {|o| options[:limit] = o} #
+  opt.on('--type POST_TYPE', 'какой тип постов показывать ' \
+         '(по умолчанию любой)') { |o| options[:type] = o }
+  opt.on('--id POST_ID', 'если задан id — показываем подробно ' \
+         ' только этот пост') { |o| options[:id] = o }
+  opt.on('--limit NUMBER', 'сколько последних постов показать ' \
+         '(по умолчанию все)') { |o| options[:limit] = o }
 end.parse!
-result=[]
 
-result = Post.find(options[:limit], options[:type], options[:id])
+result = if options[:id].nil?
+           # Если id не передали, ищем все записи по параметрам
+           Post.find_all(options[:limit], options[:type])
+         else
+           # Если передали — забиваем на остальные параметры и ищем по id
+           Post.find_by_id(options[:id])
+         end
 
 if result.is_a? Post
   puts "Запись #{result.class.name}, id = #{options[:id]}"
 
-  result.to_strings.each do |line|
-    puts line
-  end
+  result.to_strings.each { |line| puts line }
 else
-  print "|id\t| @type\t| @created_at\t\t\t| @text \t\t\t| @url\t\t| @due_date \t"
+  print '| id                 '
+  print '| @type              '
+  print '| @created_at        '
+  print '| @text              '
+  print '| @url               '
+  print '| @due_date          '
+  print '|'
 
   result.each do |row|
     puts
 
     row.each do |element|
-      print "| #{element.to_s.delete("\\n\r") [0..40]}\t"
+      element_text = "| #{element.to_s.delete("\n\r")[0..17]}"
+      element_text << ' ' * (21 - element_text.size)
+      print element_text
     end
+
+    print '|'
   end
 
+  puts
 end
-
-puts
