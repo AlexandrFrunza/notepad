@@ -3,4 +3,5 @@ Task*
 Memo*
 Link*
 parents.rb
-
+notepad.sqlite
+.DS_Store

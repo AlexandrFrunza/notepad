@@ -1,4 +1,3 @@
-# Класс "Заметка", разновидность базового класса "Запись"
 class Memo < Post
 
   # отдельный конструктор здесь не нужен, т. к. он совпадает с родительским
@@ -11,6 +10,7 @@ class Memo < Post
 
     # Объявим переменную, которая будет содержать текущую введенную строку
     line = nil
+    @text = []
 
     # Запустим цикл, пока не дошли до строчки "end",
     while line != "end" do
@@ -51,5 +51,18 @@ class Memo < Post
 
   def to_strings
 
+  end
+
+  def to_db_hash
+    return super.merge(
+      {
+        'text' => @text.join('\n\r')
+      }
+    )
+  end
+
+  def load_data(data_hash)
+    super(data_hash)
+    @text = data_hash['text'].split('\n\r')
   end
 end
